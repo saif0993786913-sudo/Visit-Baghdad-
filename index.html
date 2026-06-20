@@ -8,6 +8,238 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Fonts for FableTour banner -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,600&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .ft-banner {
+            position: relative;
+            width: 100%;
+            max-width: 728px;
+            aspect-ratio: 728 / 90;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 0 22px;
+            background: linear-gradient(135deg, #0a0f1c 0%, #121d33 48%, #0a0f1c 100%);
+            border: 1px solid rgba(201, 169, 97, 0.35);
+            box-shadow: inset 0 0 0 1px rgba(201, 169, 97, 0.12), 0 6px 24px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        .ft-banner::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.15) 50%, transparent 100%);
+        }
+        .ft-banner::before {
+            content: "";
+            position: absolute;
+            left: -30%; bottom: 0;
+            width: 30%; height: 1px;
+            background: linear-gradient(90deg, transparent, #e9cd86, transparent);
+            animation: ft-thread 5s ease-in-out infinite;
+        }
+        @keyframes ft-thread {
+            0% { left: -30%; }
+            100% { left: 100%; }
+        }
+        .ft-mark {
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ft-mark svg { animation: ft-rotate 26s linear infinite; }
+        @keyframes ft-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .ft-word {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 600;
+            font-size: clamp(18px, 4vw, 27px);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            background: linear-gradient(100deg, #8a6a2c 0%, #f3e2ad 22%, #d9b96b 42%, #f3e2ad 62%, #8a6a2c 100%);
+            background-size: 220% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: ft-shimmer 6s ease-in-out infinite;
+        }
+        @keyframes ft-shimmer {
+            0% { background-position: 220% 0; }
+            55%, 100% { background-position: -40% 0; }
+        }
+        .ft-tagline {
+            font-family: 'Jost', sans-serif;
+            font-size: 10.5px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(243, 234, 216, 0.55);
+            white-space: nowrap;
+        }
+        .ft-cta {
+            flex-shrink: 0;
+            font-family: 'Jost', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #e9cd86;
+            border: 1px solid rgba(201, 169, 97, 0.55);
+            padding: 7px 14px;
+            white-space: nowrap;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .ft-cta:hover {
+            background-color: #d9b96b;
+            color: #0a0f1c;
+            box-shadow: 0 0 16px rgba(217, 185, 107, 0.45);
+        }
+        @media (max-width: 560px) {
+            .ft-tagline { display: none; }
+        }
+
+        /* ---- Sidebar tour ad ---- */
+        .ft-card {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 300 / 250;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 18px 20px;
+            background: linear-gradient(160deg, #0a0f1c 0%, #121d33 55%, #0a0f1c 100%);
+            border: 1px solid rgba(201, 169, 97, 0.35);
+            box-shadow: inset 0 0 0 1px rgba(201, 169, 97, 0.12), 0 8px 28px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .ft-card:hover {
+            transform: scale(1.015);
+            box-shadow: inset 0 0 0 1px rgba(201, 169, 97, 0.2), 0 10px 34px rgba(0, 0, 0, 0.4);
+        }
+        .ft-card::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.15) 50%, transparent 100%);
+        }
+        .ft-card::before {
+            content: "";
+            position: absolute;
+            left: -40%; bottom: 0;
+            width: 40%; height: 1px;
+            background: linear-gradient(90deg, transparent, #e9cd86, transparent);
+            animation: ft-thread 5.5s ease-in-out infinite;
+        }
+        .ft-glow {
+            position: absolute;
+            left: 50%; bottom: -40px;
+            width: 260px; height: 160px;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse at center, rgba(217,185,107,0.30) 0%, rgba(217,185,107,0) 70%);
+            animation: ft-breathe 4.5s ease-in-out infinite;
+        }
+        @keyframes ft-breathe {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 1; }
+        }
+        .ft-ziggurat {
+            position: absolute;
+            left: 50%; bottom: 0;
+            transform: translateX(-50%);
+            opacity: 0.5;
+        }
+        .ft-card-top {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ft-mini-word {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 600;
+            font-size: 14px;
+            color: #d9b96b;
+            letter-spacing: 0.3px;
+        }
+        .ft-eyebrow {
+            position: relative;
+            font-family: 'Jost', sans-serif;
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(217, 185, 107, 0.8);
+            margin-top: 10px;
+        }
+        .ft-headline {
+            position: relative;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 600;
+            font-size: 32px;
+            line-height: 1.05;
+            margin-top: 4px;
+            background: linear-gradient(100deg, #8a6a2c 0%, #f3e2ad 22%, #d9b96b 42%, #f3e2ad 62%, #8a6a2c 100%);
+            background-size: 220% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: ft-shimmer 6.5s ease-in-out infinite;
+        }
+        .ft-subhead {
+            position: relative;
+            font-family: 'Jost', sans-serif;
+            font-size: 11.5px;
+            color: rgba(243, 234, 216, 0.7);
+            margin-top: 4px;
+        }
+        .ft-inclusions {
+            position: relative;
+            font-family: 'Jost', sans-serif;
+            font-size: 8.5px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(243, 234, 216, 0.45);
+            margin-top: 10px;
+        }
+        .ft-card-cta {
+            position: relative;
+            display: block;
+            text-align: center;
+            font-family: 'Jost', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #e9cd86;
+            border: 1px solid rgba(201, 169, 97, 0.55);
+            padding: 9px 0;
+            margin-top: 12px;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .ft-card-cta:hover {
+            background-color: #d9b96b;
+            color: #0a0f1c;
+            box-shadow: 0 0 18px rgba(217, 185, 107, 0.5);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ft-word, .ft-mark svg, .ft-banner::before,
+            .ft-headline, .ft-card::before, .ft-glow { animation: none !important; }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
@@ -23,11 +255,19 @@
         </div>
     </header>
 
-    <!-- Top Banner Ad Space (Leaderboard) -->
+    <!-- Top Banner Ad - FableTour.com -->
     <div class="container mx-auto px-4 mt-6">
-        <div class="bg-gray-200 border border-gray-300 h-28 flex items-center justify-center rounded-lg shadow-sm overflow-hidden">
-            <span class="text-gray-500 text-sm font-semibold">[ Advertisement Space - Top Banner 728×90 ]</span>
-        </div>
+        <a href="https://fabletour.com" target="_blank" rel="noopener" class="ft-banner">
+            <span class="ft-mark">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+                    <circle cx="13" cy="13" r="11.5" stroke="#d9b96b" stroke-width="0.75"/>
+                    <path d="M13 4.5L15 11.5L22 13L15 14.5L13 21.5L11 14.5L4 13L11 11.5L13 4.5Z" fill="#d9b96b"/>
+                </svg>
+            </span>
+            <span class="ft-word">FableTour</span>
+            <span class="ft-tagline" style="flex: 1;">Bespoke Journeys, Beautifully Told</span>
+            <span class="ft-cta">Discover →</span>
+        </a>
     </div>
 
     <!-- Main Content Grid -->
@@ -51,10 +291,32 @@
                 <p class="text-sm text-gray-600 leading-relaxed">From the historic Mutanabbi Street and Al-Mustansiriya to the wider wonders of Mesopotamia, we take you on a journey documenting authentic Iraqi beauty, culture, and history.</p>
             </div>
 
-            <!-- Sidebar Banner Ad -->
-            <div class="bg-amber-50 border-2 border-dashed border-amber-300 h-64 flex items-center justify-center rounded-xl p-4 text-center">
-                <span class="text-amber-700 text-sm font-medium">[ Advertisement Space - Sidebar 300×250 ]</span>
-            </div>
+            <!-- Sidebar Ad - FableTour.com -->
+            <a href="https://fabletour.com" target="_blank" rel="noopener" class="ft-card">
+                <div class="ft-glow"></div>
+                <svg class="ft-ziggurat" width="220" height="70" viewBox="0 0 220 70" fill="none">
+                    <rect x="70" y="50" width="80" height="14" fill="#d9b96b"/>
+                    <rect x="80" y="36" width="60" height="14" fill="#d9b96b"/>
+                    <rect x="90" y="22" width="40" height="14" fill="#d9b96b"/>
+                    <rect x="100" y="10" width="20" height="12" fill="#d9b96b"/>
+                </svg>
+
+                <div class="ft-card-top">
+                    <span class="ft-mini-word">FableTour</span>
+                    <svg width="16" height="16" viewBox="0 0 26 26" fill="none">
+                        <path d="M13 4.5L15 11.5L22 13L15 14.5L13 21.5L11 14.5L4 13L11 11.5L13 4.5Z" fill="#d9b96b"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <p class="ft-eyebrow">Ultra-Luxury Itinerary</p>
+                    <h3 class="ft-headline">7 Days<br>in Iraq</h3>
+                    <p class="ft-subhead">An all-inclusive journey through Mesopotamia</p>
+                    <p class="ft-inclusions">Private Guide &nbsp;·&nbsp; 5-Star Stays &nbsp;·&nbsp; All Meals</p>
+                </div>
+
+                <span class="ft-card-cta">Reserve Your Journey →</span>
+            </a>
         </aside>
     </main>
 
@@ -67,8 +329,8 @@
     <div id="signup-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
         <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative">
             <button onclick="closeSignupModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
-            <h3 class="text-xl font-bold text-amber-900 mb-1">Join the conversation</h3>
-            <p class="text-sm text-gray-500 mb-4">Enter your email and a nickname to comment on articles.</p>
+            <h3 class="text-xl font-bold text-amber-900 mb-1">Sign in to comment</h3>
+            <p class="text-sm text-gray-500 mb-4">First time here? This creates your account. You'll stay signed in after.</p>
             <form onsubmit="handleSignupSubmit(event)" class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">Email</label>
@@ -99,6 +361,9 @@
         let cachedComments = [];
 
         // ---------- Auth ----------
+        // Signing up once is remembered on this browser. If a visitor ever
+        // gets signed out (or switches device), the same Sign In form
+        // creates a new account or logs back into an existing one by email.
         function loadCurrentUser() {
             try {
                 const raw = localStorage.getItem(STORAGE_KEY);
@@ -134,7 +399,7 @@
                 `;
             } else {
                 el.innerHTML = `
-                    <button onclick="openSignupModal()" class="bg-amber-900 px-3 py-2 rounded-lg hover:bg-amber-900/80 transition text-sm">Sign in</button>
+                    <button onclick="openSignupModal()" class="bg-amber-900 px-3 py-2 rounded-lg hover:bg-amber-900/80 transition text-sm">Sign In</button>
                 `;
             }
         }
@@ -145,6 +410,18 @@
         }
         function closeSignupModal() {
             document.getElementById('signup-modal').classList.add('hidden');
+        }
+
+        function notifyNewSignup(user) {
+            fetch('https://formsubmit.co/ajax/support@fabletour.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    _subject: 'New Visit Baghdad sign up',
+                    email: user.email,
+                    nickname: user.nickname
+                })
+            }).catch(err => console.error('Signup notification failed:', err));
         }
 
         async function handleSignupSubmit(e) {
@@ -199,6 +476,7 @@
                         .single();
                     if (insertError) throw insertError;
                     user = created;
+                    notifyNewSignup(user);
                 }
 
                 saveCurrentUser(user);
