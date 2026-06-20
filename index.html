@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit Baghdad - Discover Mesopotamia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-amber-700 text-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center flex-wrap gap-3">
+            <h1 class="text-2xl font-bold tracking-wide">Visit Baghdad 🇮🇶</h1>
+            <nav class="flex items-center gap-4">
+                <a href="index.html" class="hover:text-amber-200 transition font-semibold">Home</a>
+                <a href="#" class="hover:text-amber-200 transition">Articles</a>
+                <div id="auth-section" class="flex items-center gap-2"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Top Banner Ad Space (Leaderboard) -->
+    <div class="container mx-auto px-4 mt-6">
+        <div class="bg-gray-200 border border-gray-300 h-28 flex items-center justify-center rounded-lg shadow-sm overflow-hidden">
+            <span class="text-gray-500 text-sm font-semibold">[ Advertisement Space - Top Banner 728×90 ]</span>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- Articles & Videos Section (Takes 3 Columns) -->
+        <section class="lg:col-span-3">
+            <h2 class="text-3xl font-bold mb-6 text-amber-900 border-b-2 border-amber-600 pb-2">Latest Explorations & Stories</h2>
+
+            <!-- Dynamic Content Container -->
+            <div id="articles-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Loading State -->
+                <p class="text-gray-500 col-span-2">Loading the magic of Baghdad & Mesopotamia...</p>
+            </div>
+        </section>
+
+        <!-- Sidebar for Ads & Info (Takes 1 Column) -->
+        <aside class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-4 rounded-xl shadow-md border border-gray-100">
+                <h3 class="font-bold text-lg mb-3 text-amber-800">About Baghdad</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">From the historic Mutanabbi Street and Al-Mustansiriya to the wider wonders of Mesopotamia, we take you on a journey documenting authentic Iraqi beauty, culture, and history.</p>
+            </div>
+
+            <!-- Sidebar Banner Ad -->
+            <div class="bg-amber-50 border-2 border-dashed border-amber-300 h-64 flex items-center justify-center rounded-xl p-4 text-center">
+                <span class="text-amber-700 text-sm font-medium">[ Advertisement Space - Sidebar 300×250 ]</span>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-6 mt-12 border-t border-gray-800 text-center text-sm">
+        <p>All Rights Reserved © Visit Baghdad 2026</p>
+    </footer>
+
+    <!-- Sign Up / Sign In Modal -->
+    <div id="signup-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative">
+            <button onclick="closeSignupModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            <h3 class="text-xl font-bold text-amber-900 mb-1">Join the conversation</h3>
+            <p class="text-sm text-gray-500 mb-4">Enter your email and a nickname to comment on articles.</p>
+            <form onsubmit="handleSignupSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Email</label>
+                    <input id="signup-email" type="email" required placeholder="you@example.com"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nickname</label>
+                    <input id="signup-nickname" type="text" required maxlength="40" placeholder="e.g. DesertWanderer"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                </div>
+                <p id="signup-error" class="hidden text-sm text-red-500"></p>
+                <button id="signup-submit" type="submit" class="w-full bg-amber-700 text-white font-semibold py-2 rounded-lg hover:bg-amber-800 transition">Continue</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase Integration Script -->
+    <script>
+        const SUPABASE_URL = "https://rckewfjlehmbsyzyrarp.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable__VILBnpuU9tniR7W6MBiXg_Bnmk_GaL";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const STORAGE_KEY = 'visitbaghdad_user';
+        let currentUser = null;
+        let cachedArticles = [];
+        let cachedComments = [];
+
+        // ---------- Auth ----------
+        function loadCurrentUser() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) currentUser = JSON.parse(raw);
+            } catch (e) {
+                currentUser = null;
+            }
+            renderAuthUI();
+        }
+
+        function saveCurrentUser(user) {
+            currentUser = user;
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            } catch (e) {}
+            renderAuthUI();
+            renderArticles();
+        }
+
+        function logout() {
+            currentUser = null;
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            renderAuthUI();
+            renderArticles();
+        }
+
+        function renderAuthUI() {
+            const el = document.getElementById('auth-section');
+            if (currentUser) {
+                el.innerHTML = `
+                    <span class="text-sm text-amber-100 hidden sm:inline">Hi, ${escapeHtml(currentUser.nickname)}</span>
+                    <button onclick="logout()" class="bg-amber-900 px-3 py-2 rounded-lg hover:bg-amber-900/80 transition text-sm">Log out</button>
+                `;
+            } else {
+                el.innerHTML = `
+                    <button onclick="openSignupModal()" class="bg-amber-900 px-3 py-2 rounded-lg hover:bg-amber-900/80 transition text-sm">Sign in</button>
+                `;
+            }
+        }
+
+        function openSignupModal() {
+            document.getElementById('signup-error').classList.add('hidden');
+            document.getElementById('signup-modal').classList.remove('hidden');
+        }
+        function closeSignupModal() {
+            document.getElementById('signup-modal').classList.add('hidden');
+        }
+
+        async function handleSignupSubmit(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('signup-email');
+            const nicknameInput = document.getElementById('signup-nickname');
+            const errorEl = document.getElementById('signup-error');
+            const submitBtn = document.getElementById('signup-submit');
+
+            const email = emailInput.value.trim().toLowerCase();
+            const nickname = nicknameInput.value.trim();
+
+            if (!email || !nickname) {
+                errorEl.textContent = 'Please enter both an email and a nickname.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Please wait...';
+            errorEl.classList.add('hidden');
+
+            try {
+                let { data: existing, error: findError } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (findError) throw findError;
+
+                let user;
+
+                if (existing) {
+                    if (existing.nickname !== nickname) {
+                        const { data: updated, error: updateError } = await supabaseClient
+                            .from('users')
+                            .update({ nickname })
+                            .eq('id', existing.id)
+                            .select()
+                            .single();
+                        if (updateError) throw updateError;
+                        user = updated;
+                    } else {
+                        user = existing;
+                    }
+                } else {
+                    const { data: created, error: insertError } = await supabaseClient
+                        .from('users')
+                        .insert({ email, nickname })
+                        .select()
+                        .single();
+                    if (insertError) throw insertError;
+                    user = created;
+                }
+
+                saveCurrentUser(user);
+                closeSignupModal();
+                emailInput.value = '';
+                nicknameInput.value = '';
+            } catch (err) {
+                console.error(err);
+                errorEl.textContent = 'Something went wrong. Please try again.';
+                errorEl.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Continue';
+            }
+        }
+
+        // ---------- Articles & comments ----------
+        async function fetchArticles() {
+            const container = document.getElementById('articles-container');
+
+            let { data: articles, error } = await supabaseClient
+                .from('articles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error(error);
+                container.innerHTML = '<p class="text-red-500">Failed to load articles.</p>';
+                return;
+            }
+
+            cachedArticles = articles || [];
+
+            let { data: comments, error: commentsError } = await supabaseClient
+                .from('comments')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            cachedComments = commentsError ? [] : (comments || []);
+            if (commentsError) console.error(commentsError);
+
+            renderArticles();
+        }
+
+        function renderArticles() {
+            const container = document.getElementById('articles-container');
+
+            if (cachedArticles.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No articles published yet.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            cachedArticles.forEach(article => {
+                let videoEmbed = '';
+                if (article.video_url) {
+                    let videoId = extractYouTubeId(article.video_url);
+                    if (videoId) {
+                        videoEmbed = `
+                            <div class="relative h-48 w-full mt-3 rounded-lg overflow-hidden shadow">
+                                <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+                            </div>`;
+                    }
+                }
+
+                const articleComments = cachedComments.filter(c => c.article_id === article.id);
+
+                const commentsHtml = articleComments.map(c => `
+                    <div class="text-sm border-t border-gray-100 pt-2 mt-2">
+                        <span class="font-semibold text-amber-800">${escapeHtml(c.nickname)}</span>
+                        <span class="text-gray-400 text-xs ml-1">${new Date(c.created_at).toLocaleDateString('en-US')}</span>
+                        <p class="text-gray-600">${escapeHtml(c.content)}</p>
+                    </div>
+                `).join('');
+
+                const commentForm = currentUser ? `
+                    <form onsubmit="handleCommentSubmit(event, '${article.id}')" class="mt-3 flex gap-2">
+                        <input type="text" placeholder="Add a comment..." required maxlength="500"
+                            class="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400" />
+                        <button type="submit" class="bg-amber-700 text-white text-sm px-3 py-2 rounded-lg hover:bg-amber-800 transition">Post</button>
+                    </form>
+                ` : `
+                    <p class="text-sm text-gray-500 mt-3">
+                        <button onclick="openSignupModal()" class="text-amber-700 font-semibold hover:underline">Sign in</button>
+                        to leave a comment.
+                    </p>
+                `;
+
+                const card = `
+                    <article class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            ${article.image_url ? `<img src="${article.image_url}" alt="${escapeHtml(article.title)}" class="w-full h-48 object-cover">` : ''}
+                            <div class="p-5">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${escapeHtml(article.title)}</h3>
+                                <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">${escapeHtml(article.content)}</p>
+                                ${videoEmbed}
+                                <div class="mt-4">
+                                    <h4 class="text-xs font-bold uppercase tracking-wide text-gray-400">Comments${articleComments.length ? ` (${articleComments.length})` : ''}</h4>
+                                    ${commentsHtml}
+                                    ${commentForm}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 mt-auto">
+                            <span class="text-xs text-gray-400">${new Date(article.created_at).toLocaleDateString('en-US')}</span>
+                        </div>
+                    </article>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        async function handleCommentSubmit(e, articleId) {
+            e.preventDefault();
+            if (!currentUser) {
+                openSignupModal();
+                return;
+            }
+            const input = e.target.querySelector('input');
+            const content = input.value.trim();
+            if (!content) return;
+
+            const { data, error } = await supabaseClient
+                .from('comments')
+                .insert({
+                    article_id: articleId,
+                    user_id: currentUser.id,
+                    nickname: currentUser.nickname,
+                    content
+                })
+                .select()
+                .single();
+
+            if (error) {
+                console.error(error);
+                alert('Could not post your comment. Please try again.');
+                return;
+            }
+
+            cachedComments.push(data);
+            renderArticles();
+        }
+
+        function extractYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        loadCurrentUser();
+        fetchArticles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visit Baghdad | Creator Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col p-4 hidden md:flex">
+            <div class="text-xl font-bold text-amber-400 mb-8 border-b border-slate-700 pb-4 text-center">Visit Baghdad HQ</div>
+            <nav class="space-y-2 flex-1">
+                <a href="index.html" class="block py-2 px-4 rounded hover:bg-slate-800 transition">View Main Site</a>
+                <a href="#" class="block py-2 px-4 rounded bg-amber-700 font-semibold text-white">Add New Post</a>
+            </nav>
+            <div class="text-xs text-slate-500 text-center">Version 1.0</div>
+        </aside>
+
+        <!-- Main Dashboard Content Panel -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                <h2 class="text-2xl font-bold mb-2 text-slate-900">Publish to Visit Baghdad 🗺️</h2>
+                <p class="text-gray-500 text-sm mb-6">Fill in the fields below to push content directly to the live visitor platform.</p>
+
+                <!-- Input Form -->
+                <form id="article-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Article Title / Destination Name</label>
+                        <input type="text" id="title" required placeholder="e.g., A Walk Through Mutanabbi Street"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Article Content / Travel Details</label>
+                        <textarea id="content" rows="6" required placeholder="Describe the destination highlights, cultural history, and travel tips..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Image URL</label>
+                        <input type="url" id="image_url" placeholder="https://example.com/baghdad-photo.jpg"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent">
+                        <span class="text-xs text-gray-400 mt-1 block">Paste a direct image link hosted online.</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Video Link (YouTube URL)</label>
+                        <input type="url" id="video_url" placeholder="https://www.youtube.com/watch?v=..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-transparent">
+                        <span class="text-xs text-gray-400 mt-1 block">Paste a YouTube link to render an interactive player on the card.</span>
+                    </div>
+
+                    <button type="submit" id="submit-btn"
+                        class="w-full bg-amber-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-800 transition shadow cursor-pointer">
+                        Publish Post Live
+                    </button>
+                </form>
+
+                <!-- Status Feedback -->
+                <div id="status-msg" class="mt-4 p-3 rounded-lg hidden text-center font-medium"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase Form Processor Script -->
+    <script>
+        const SUPABASE_URL = "https://rckewfjlehmbsyzyrarp.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable__VILBnpuU9tniR7W6MBiXg_Bnmk_GaL";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('article-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const statusMsg = document.getElementById('status-msg');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Syncing securely to Database...';
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const image_url = document.getElementById('image_url').value || null;
+            const video_url = document.getElementById('video_url').value || null;
+
+            const { data, error } = await supabaseClient
+                .from('articles')
+                .insert([
+                    { title, content, image_url, video_url }
+                ]);
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Publish Post Live';
+
+            statusMsg.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
+            if (error) {
+                console.error(error);
+                statusMsg.innerText = 'Error publishing: ' + error.message;
+                statusMsg.classList.add('bg-red-100', 'text-red-800');
+            } else {
+                statusMsg.innerText = '🚀 Content deployed successfully to Visit Baghdad!';
+                statusMsg.classList.add('bg-green-100', 'text-green-800');
+                form.reset();
+            }
+        });
+    </script>
+</body>
+</html>
